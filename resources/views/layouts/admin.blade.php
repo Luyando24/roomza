@@ -1,0 +1,1 @@
+<!-- Replace any references to route('chatify') with route('chat.index') -->

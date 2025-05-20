@@ -164,7 +164,8 @@ return [
         /*
          * Package Service Providers...
          */
-        Chatify\ChatifyServiceProvider::class,
+        // Remove the Spatie Permission service provider
+        // Spatie\Permission\PermissionServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -173,7 +174,12 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\ChatifyRouteServiceProvider::class,
+        App\Providers\FortifyServiceProvider::class,
+        App\Providers\JetstreamServiceProvider::class,
+        App\Providers\RoleServiceProvider::class,
     ],
 
 ];
+
+
+

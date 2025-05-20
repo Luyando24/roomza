@@ -31,8 +31,7 @@ class PropertyPolicy
      */
     public function create(User $user): bool
     {
-        // Only business accounts can create properties
-        return $user->business_type === 'business' || $user->hasRole('admin');
+        return $user->hasRole(['admin', 'business']);
     }
 
     /**
@@ -40,7 +39,11 @@ class PropertyPolicy
      */
     public function update(User $user, Property $property): bool
     {
-        return $user->id === $property->user_id || $user->hasRole('admin');
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+        
+        return $user->id === $property->user_id;
     }
 
     /**
@@ -48,7 +51,11 @@ class PropertyPolicy
      */
     public function delete(User $user, Property $property): bool
     {
-        return $user->id === $property->user_id || $user->hasRole('admin');
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+        
+        return $user->id === $property->user_id;
     }
 
     /**
@@ -75,5 +82,7 @@ class PropertyPolicy
         return $user->hasRole('admin') || $user->hasPermissionTo('verify properties');
     }
 }
+
+
 
 

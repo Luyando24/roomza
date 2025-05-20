@@ -522,8 +522,8 @@ class PropertyResource extends Resource
                 Tables\Columns\IconColumn::make('is_verified')
                     ->boolean()
                     ->label('Verified')
-                    ->trueIcon('heroicon-o-badge-check')
-                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueIcon('heroicon-o-check-badge') 
+                    ->falseIcon('heroicon-o-x-mark')
                     ->trueColor('success')
                     ->falseColor('danger'),
             ])

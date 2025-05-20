@@ -69,5 +69,79 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * Check if user has a specific role.
+     *
+     * @param string|array $roles
+     * @return bool
+     */
+    public function hasRole($roles): bool
+    {
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+
+        if (in_array('admin', $roles) && $this->isAdmin()) {
+            return true;
+        }
+
+        if (in_array('business', $roles) && $this->business_type === 'business') {
+            return true;
+        }
+
+        if (in_array('personal', $roles) && $this->business_type !== 'business') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        // You can implement your admin check logic here
+        // For example, check if email is admin@example.com or if there's an is_admin column
+        return $this->email === 'admin@example.com' || ($this->is_admin ?? false);
+    }
+
+    /**
+     * Check if user has a specific permission.
+     *
+     * @param string $permission
+     * @return bool
+     */
+    public function hasPermissionTo($permission): bool
+    {
+        // Admins have all permissions
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Business users have specific permissions
+        if ($this->business_type === 'business') {
+            $businessPermissions = [
+                'view properties',
+                'create properties',
+                'edit properties',
+                'delete properties',
+            ];
+
+            return in_array($permission, $businessPermissions);
+        }
+
+        // Personal users have limited permissions
+        $personalPermissions = [
+            'view properties',
+        ];
+
+        return in_array($permission, $personalPermissions);
+    }
 }
+
+
 

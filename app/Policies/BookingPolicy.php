@@ -23,9 +23,13 @@ class BookingPolicy
      */
     public function view(User $user, Booking $booking): bool
     {
+        // Check if user has role method, otherwise fall back to direct check
+        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            return true;
+        }
+        
         return $user->id === $booking->user_id || 
-               $user->id === $booking->property->user_id || 
-               $user->hasRole('admin');
+               $user->id === $booking->property->user_id;
     }
 
     /**
@@ -41,9 +45,13 @@ class BookingPolicy
      */
     public function update(User $user, Booking $booking): bool
     {
+        // Check if user has role method, otherwise fall back to direct check
+        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            return true;
+        }
+        
         return $user->id === $booking->user_id || 
-               $user->id === $booking->property->user_id || 
-               $user->hasRole('admin');
+               $user->id === $booking->property->user_id;
     }
 
     /**
@@ -51,6 +59,38 @@ class BookingPolicy
      */
     public function delete(User $user, Booking $booking): bool
     {
-        return $user->hasRole('admin');
+        // Check if user has role method, otherwise fall back to direct check
+        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            return true;
+        }
+        
+        return $user->id === $booking->user_id || 
+               $user->id === $booking->property->user_id;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Booking $booking): bool
+    {
+        // Check if user has role method, otherwise fall back to direct check
+        if (method_exists($user, 'hasRole')) {
+            return $user->hasRole('admin');
+        }
+        
+        return false;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Booking $booking): bool
+    {
+        // Check if user has role method, otherwise fall back to direct check
+        if (method_exists($user, 'hasRole')) {
+            return $user->hasRole('admin');
+        }
+        
+        return false;
     }
 }

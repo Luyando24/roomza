@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use App\Providers\RouteServiceProvider;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,27 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // Set custom redirect after registration
+        Fortify::registerView(function () {
+            return view('auth.register');
+        });
+
+        // Set custom redirect after login
+        Fortify::loginView(function () {
+            return view('auth.login');
+        });
+
+        // Set custom redirect paths
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\LoginResponse::class,
+            \App\Http\Responses\LoginResponse::class
+        );
+
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\RegisterResponse::class,
+            \App\Http\Responses\RegisterResponse::class
+        );
+
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
@@ -44,3 +66,4 @@ class FortifyServiceProvider extends ServiceProvider
         });
     }
 }
+

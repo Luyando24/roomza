@@ -10,8 +10,19 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
+    /**
+     * The path to your application's "home" route.
+     *
+     * Typically, users are redirected here after authentication.
+     * This is used by Laravel authentication components.
+     *
+     * @var string
+     */
     public const HOME = '/dashboard';
 
+    /**
+     * Define your route model bindings, pattern filters, and other route configuration.
+     */
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
@@ -32,5 +43,20 @@ class RouteServiceProvider extends ServiceProvider
                     ->group(base_path('routes/jetstream.php'));
             }
         });
+    }
+
+    /**
+     * Get the redirect path based on user type.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    public static function redirectTo(Request $request)
+    {
+        if ($request->user() && $request->user()->business_type === 'business') {
+            return '/admin';
+        }
+
+        return '/';
     }
 }

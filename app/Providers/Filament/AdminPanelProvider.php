@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
@@ -15,13 +14,10 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Monzer\FilamentChatifyIntegration\ChatifyPlugin;
-use App\Filament\Widgets\StatsOverview;
-use Filament\Navigation\NavigationItem;
-use Filament\Navigation\NavigationGroup;
-use App\Filament\Plugins\CustomChatifyPlugin;
+use App\Http\Middleware\EnsureBusinessUser;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -31,9 +27,6 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->plugin(new CustomChatifyPlugin())
-            ->brandLogo(asset('images/logo.png'))
-            ->favicon(asset('images/favicon.png'))
             ->login()
             ->colors([
                 'gray' => Color::Gray,
@@ -49,38 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                StatsOverview::class,
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
-            ->navigationItems([
-                NavigationItem::make('Add Property')
-                    ->url(fn (): string => route('filament.admin.resources.properties.create'))
-                    ->icon('heroicon-o-plus-circle')
-                    ->group('Quick Actions')
-                    ->sort(1),
-                NavigationItem::make('Messages')
-                    ->url(fn (): string => route('chat.index'))
-                    ->icon('heroicon-o-chat-bubble-left-right')
-                    ->group('Communication')
-                    ->sort(1)
-                    ->badge(fn () => \Chatify\Facades\ChatifyMessenger::countUnseenMessages(auth()->id()) ?: null),
-            ])
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Resources')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('Communication')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('Quick Actions')
-                    ->collapsed(false),
-            ])
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
-            ->sidebarCollapsibleOnDesktop()
-            ->renderHook(
-                'panels::sidebar.start',
-                fn () => view('components.add-property-button')
-            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -94,9 +58,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                EnsureBusinessUser::class,
             ]);
     }
 }
+
 
 
 

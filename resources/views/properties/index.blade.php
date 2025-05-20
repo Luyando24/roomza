@@ -141,12 +141,11 @@
                                     <a href="{{ route('properties.show', $property) }}" class="block group">
                                         <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
                                             <div class="aspect-w-16 aspect-h-9">
-                                                @if($property->featured_image && Storage::exists($property->featured_image))
+                                                @if($property->cover_image)
                                                     <img 
-                                                        src="{{ Storage::url($property->featured_image) }}" 
+                                                        src="{{ Storage::url($property->cover_image) }}" 
                                                         alt="{{ $property->title }}" 
                                                         class="w-full h-full object-cover"
-                                                        onerror="this.onerror=null; this.src='{{ asset('images/placeholder.jpg') }}'"
                                                     >
                                                 @else
                                                     <div class="w-full h-full bg-gray-200 flex items-center justify-center">
